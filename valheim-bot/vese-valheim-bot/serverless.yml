@@ -1,0 +1,33 @@
+service: vese-valheim-bot
+frameworkVersion: '2 || 3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: '20201221'
+  region: eu-north-1
+  environment:
+    DISCORD_API_TOKEN: ${env:DISCORD_API_TOKEN}
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Action:
+            - 'ec2:DescribeInstances'
+          Resource: "*"
+        - Effect: 'Allow'
+          Action:
+            - 'ec2:StartInstances'
+          Resource: "*"
+
+functions:
+  valheim-discord-bot:
+    handler: handler.lambda_handler
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true
+
+plugins:
+  - serverless-python-requirements
