@@ -13,6 +13,7 @@ jobs:
   terraform:
     env:
       working-directory: terraform
+      TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
     name: "Terraform"
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +48,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' ||  github.event_name == 'push'
         run: terraform plan -no-color -out tfplan.binary
         continue-on-error: true
         working-directory: ${{ env.working-directory }}
@@ -124,5 +125,6 @@ jobs:
           # behavior: new # Create a new cost estimate comment on every push.
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: terraform apply -auto-approve
+        working-directory: ${{ env.working-directory }}

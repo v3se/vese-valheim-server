@@ -1,8 +1,12 @@
 resource "aws_instance" "valheim-server" {
   ami           = var.ec2_ami_id
   instance_type = var.ec2_instance_type
+  associate_public_ip_address = true
   tags = {
     Name = "valheim-server"
+  }
+  lifecycle {
+    ignore_changes = [associate_public_ip_address]
   }
   vpc_security_group_ids  = [aws_security_group.valheim.id]
 }
