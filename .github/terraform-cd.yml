@@ -13,6 +13,7 @@ jobs:
   terraform:
     env:
       working-directory: terraform
+      TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
     name: "Terraform"
     runs-on: ubuntu-latest
     steps:
