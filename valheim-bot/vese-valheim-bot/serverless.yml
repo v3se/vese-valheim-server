@@ -8,6 +8,7 @@ provider:
   region: eu-north-1
   environment:
     DISCORD_PUBLIC_KEY: ${env:DISCORD_PUBLIC_KEY}
+    AWS_REGION: ${env:AWS_REGION}
   iam:
     role:
       statements:

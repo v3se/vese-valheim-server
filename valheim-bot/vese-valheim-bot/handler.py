@@ -8,6 +8,7 @@ from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 
 PUBLIC_KEY = os.environ['DISCORD_PUBLIC_KEY'] # found on Discord Application -> General Information page
+AWS_REGION = os.environ['AWS_REGION']
 
 def lambda_handler(event, context):
   try:
@@ -65,7 +66,7 @@ def lambda_child_check_status(body):
 
 def start_valheim_server(body):
     # Do a dryrun first to verify permissions
-    ec2 = boto3.client('ec2', region_name='eu-north-1')
+    ec2 = boto3.client('ec2', region_name=AWS_REGION)
     response = ec2.describe_instances(
         Filters=[
             {

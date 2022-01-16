@@ -1,8 +1,10 @@
 import requests
 import time
+import os
 from boto3 import client as boto3_client
 
 # This function is called from the parent function
+AWS_REGION = os.environ['AWS_REGION']
 
 def lambda_handler(event, context):
     print(event)
@@ -14,7 +16,7 @@ def lambda_handler(event, context):
     
     # Check if the public address is allocated to the started instance. Repeat 10 times.
     for i in range(10):
-        ec2 = boto3_client('ec2', region_name='eu-north-1')
+        ec2 = boto3_client('ec2', region_name=AWS_REGION)
         try:
             response = ec2.describe_instances(
                 Filters=[
