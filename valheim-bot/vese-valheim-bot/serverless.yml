@@ -7,7 +7,7 @@ provider:
   lambdaHashingVersion: '20201221'
   region: eu-north-1
   environment:
-    DISCORD_API_TOKEN: ${env:DISCORD_API_TOKEN}
+    DISCORD_PUBLIC_KEY: ${env:DISCORD_PUBLIC_KEY}
   iam:
     role:
       statements:
@@ -19,15 +19,24 @@ provider:
           Action:
             - 'ec2:StartInstances'
           Resource: "*"
-
+        - Effect: 'Allow'
+          Action:
+            - 'lambda:InvokeFunction'
+          Resource: "*"
+        
 functions:
   valheim-discord-bot:
     handler: handler.lambda_handler
+    timeout: 30
     events:
       - http:
           path: /
           method: post
           cors: true
+  valheim-child-status:
+    name: valheim-child-status
+    timeout: 30
+    handler: valheim_child_status.lambda_handler
 
 plugins:
   - serverless-python-requirements

@@ -1,12 +1,13 @@
 import json
 import os
 import boto3
+from boto3 import client as boto3_client
+from datetime import datetime
 from botocore.exceptions import ClientError
-
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 
-PUBLIC_KEY = os.environ['DISCORD_API_TOKEN'] # found on Discord Application -> General Information page
+PUBLIC_KEY = os.environ['DISCORD_PUBLIC_KEY'] # found on Discord Application -> General Information page
 
 def lambda_handler(event, context):
   try:
@@ -16,7 +17,7 @@ def lambda_handler(event, context):
     signature = event['headers']['x-signature-ed25519']
     timestamp = event['headers']['x-signature-timestamp']
 
-    # validate the interaction
+    # Verifies the that the POST is from discord using public key
 
     verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
@@ -29,8 +30,6 @@ def lambda_handler(event, context):
         'statusCode': 401,
         'body': json.dumps('invalid request signature')
       }
-    
-    # handle the interaction
 
     t = body['type']
 
@@ -51,7 +50,20 @@ def lambda_handler(event, context):
   except:
     raise
 
-def start_valheim_server():
+def lambda_child_check_status(body):
+    # Invoke child lambda function for performing backend tasks
+    # Discord expects response within 3s. Therefore a follow up message is necessary in this case
+    # to report pub ip address
+    lambda_client = boto3_client('lambda')
+    #Parse interaction token and app id from body
+    msg = {"application_id": body["application_id"], "interaction_token": body["token"]}
+    invoke_response = lambda_client.invoke(FunctionName="valheim-child-status",
+                                           InvocationType='Event',
+                                           Payload=json.dumps(msg))
+    print(invoke_response)
+
+
+def start_valheim_server(body):
     # Do a dryrun first to verify permissions
     ec2 = boto3.client('ec2', region_name='eu-north-1')
     response = ec2.describe_instances(
@@ -63,6 +75,19 @@ def start_valheim_server():
     )
     print(response)
     instance_id = response["Reservations"][0]["Instances"][0]["InstanceId"]
+    state = response["Reservations"][0]["Instances"][0]["State"]["Name"]
+
+    if state == "running":
+      public_ip = response["Reservations"][0]["Instances"][0]["PublicIpAddress"]
+      return {
+      'statusCode': 200,
+      'body': json.dumps({
+          'type': 4,
+          'data': {
+          'content': "Server is already running at:  " + public_ip,
+          }
+      })
+      }
 
     try:
         ec2.start_instances(InstanceIds=[instance_id], DryRun=True)
@@ -73,29 +98,30 @@ def start_valheim_server():
     try:
         response = ec2.start_instances(InstanceIds=[instance_id], DryRun=False)
         print(response)
+        
         parse_id = response["StartingInstances"][0]["InstanceId"]
-
-        response = ec2.describe_instances(
-            Filters=[
-                {
-                    'Name': 'tag:Name', 'Values':['valheim-server'],
-                },
-            ],
-        )
-
-        ip_addr = response["Reservations"][0]["Instances"][0]["PublicIpAddress"]
+        lambda_child_check_status(body)
         return {
         'statusCode': 200,
         'body': json.dumps({
             'type': 4,
             'data': {
-            'content': "Starting instance with ID: " + parse_id  + "Public IP: " + ip_addr,
+            'content': "Yes Sir! Starting valheim server for you... Reporting the IP address shortly. Here's the EC2 ID: " + parse_id,
             }
         })
         }
-
+  
     except ClientError as e:
         print(e)
+        return {
+        'statusCode': 200,
+        'body': json.dumps({
+            'type': 4,
+            'data': {
+            'content': e.response['Error']['Message'],
+            }
+        })
+        }
 
 def command_handler(body):
   command = body['data']['name']
@@ -106,13 +132,14 @@ def command_handler(body):
       'body': json.dumps({
         'type': 4,
         'data': {
-          'content': 'Hello, World.',
+          'content': 'Well hello there my good Sir!',
         }
       })
     }
 
   if command == 'start_valheim':
-    return start_valheim_server()
+    return start_valheim_server(body)
+
 
   else:
     return {
