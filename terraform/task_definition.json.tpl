@@ -7,14 +7,27 @@
         "essential": true,
         "mountPoints": [
             {
-                "sourceVolume": "${source_volume}",
-                "containerPath": "${container_path}"
-            }    
+                "sourceVolume": "${source_volume_data}",
+                "containerPath": "${container_path_data}"
+            },
+            {
+                "sourceVolume": "${source_volume_config}",
+                "containerPath": "${container_path_config}"
+            }      
         ],
-        "command": [
-            "sh",
-            "-c",
-            "ln -s /config /mnt/valheim-ebs && ln -s /opt/valheim /mnt/valheim-ebs && /usr/local/sbin/bootstrap"
+        "volumes": [
+            {
+                "name": "${source_volume_config}",
+                "efsVolumeConfiguration": {
+                    "fileSystemId": "${efs_id}"
+                }
+            },
+            {
+                "name": "${source_volume_data}",
+                "efsVolumeConfiguration": {
+                    "fileSystemId": "${efs_id}"
+                }
+            }
         ],
         "environment": [
             {

@@ -45,7 +45,7 @@ variable "public_key" {
 }
 
 variable "adminlist_ids" {
-  type        = list
+  type        = list(any)
   description = "List of Valheim Admin Steam IDs"
 }
 

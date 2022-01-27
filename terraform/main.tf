@@ -27,3 +27,7 @@ resource "aws_key_pair" "valheim" {
 }
 
 data "aws_caller_identity" "aws-info" {}
+
+data "aws_vpc" "valheim" {
+  default = true
+}

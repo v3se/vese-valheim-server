@@ -110,10 +110,10 @@ resource "aws_launch_template" "ecs_launch_template" {
 }
 
 resource "aws_autoscaling_group" "ecs_asg" {
-  name                = "valheim-asg"
-  max_size            = 1
-  min_size            = 1
-  availability_zones  = ["eu-north-1a"]
+  name               = "valheim-asg"
+  max_size           = 1
+  min_size           = 1
+  availability_zones = ["eu-north-1a"]
 
   launch_template {
     id      = aws_launch_template.ecs_launch_template.id
