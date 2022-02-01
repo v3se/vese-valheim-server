@@ -52,6 +52,13 @@ jobs:
         continue-on-error: true
         working-directory: ${{ env.working-directory }}
 
+      - name: Terraform Plan 2
+        id: plan2
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' ||  github.event_name == 'push'
+        run: terraform plan -no-color  -out tfplan.binary
+        continue-on-error: true
+        working-directory: ${{ env.working-directory }}
+
       - name: Terraform show
         id: tf_show
         if: github.event_name == 'pull_request'
