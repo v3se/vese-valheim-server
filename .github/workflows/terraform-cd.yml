@@ -55,13 +55,13 @@ jobs:
       - name: Terraform show
         id: tf_show
         if: github.event_name == 'pull_request'
-        run: terraform show -json tfplan.binary > plan.json && cat plan.json
+        run: terraform show -json tfplan.binary > plan.json
         working-directory: ${{ env.working-directory }}
 
       - uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
         env:
-          PLAN: "terraform\n${{ steps.tf_show.outputs.stdout }}"
+          PLAN: "${{ steps.plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -124,14 +124,16 @@ jobs:
           # behavior: new # Create a new cost estimate comment on every push.
           
       - name: Share artifact inside workflow
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v1
         with:
           name: terraform-artifact
-          path: ${{ env.working-directory }
+          path: ${{ env.working-directory }}
           
   deploy:
     needs: plan
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     environment: dev
     steps:
       - name: Get artifact
