@@ -1,4 +1,4 @@
-### Common ###
+### Common #####
 project_common_tag = "valheim"
 aws_region         = "eu-north-1"
 
