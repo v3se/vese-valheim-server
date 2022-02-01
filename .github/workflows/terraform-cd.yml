@@ -11,6 +11,7 @@ on:
 
 jobs:
   plan:
+    environment: dev
     env:
       working-directory: terraform
       TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
@@ -133,34 +134,7 @@ jobs:
           behavior: update # Create a single comment and update it. The "quietest" option.                 
           # behavior: delete-and-new # Delete previous comments and create a new one.
           # behavior: hide-and-new # Minimize previous comments and create a new one.
-          # behavior: new # Create a new cost estimate comment on every push.
-          
-      - name: Share artifact inside workflow
-        uses: actions/upload-artifact@v1
-        with:
-          name: terraform-artifact
-          path: ${{ env.working-directory }}
-          
-  deploy:
-    env:
-      TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
-    needs: plan
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: dev
-    steps:
-      - name: Get artifact
-        uses: actions/download-artifact@v1
-        with:
-          name: terraform-artifact
-          path: ${{ github.workspace }}/${{ env.working-directory }}
-          
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # behavior: new # Create a new cost estimate comment on every push
           
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
