@@ -8,6 +8,8 @@ on:
 
 jobs:
   terraform:
+    env:
+      working-directory: terraform
     name: "Terraform"
     runs-on: ubuntu-latest
     steps:
@@ -18,25 +20,29 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          terraform_wrapper: false
 
       - name: Terraform Format
         id: fmt
         run: terraform fmt -check
+        working-directory: ${{ env.working-directory }}
 
       - name: Terraform Init
         id: init
         run: terraform init
+        working-directory: ${{ env.working-directory }}
       
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
+        working-directory: ${{ env.working-directory }}
 
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
         continue-on-error: true
+        working-directory: ${{ env.working-directory }}
 
       - uses: actions/github-script@0.9.0
         if: github.event_name == 'pull_request'
@@ -65,6 +71,3 @@ jobs:
         if: steps.plan.outcome == 'failure'
         run: exit 1
 
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve
