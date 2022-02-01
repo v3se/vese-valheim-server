@@ -10,11 +10,10 @@ on:
   pull_request:
 
 jobs:
-  terraform:
+  plan:
     env:
       working-directory: terraform
       TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
-    name: "Terraform"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -123,7 +122,24 @@ jobs:
           # behavior: delete-and-new # Delete previous comments and create a new one.
           # behavior: hide-and-new # Minimize previous comments and create a new one.
           # behavior: new # Create a new cost estimate comment on every push.
-
+          
+      - name: Share artifact inside workflow
+        uses: actions/upload-artifact@v1
+        with:
+          name: terraform-artifact
+          path: ${{ env.working-directory }
+          
+  deploy:
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Get artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: terraform-artifact
+          path: ${{ github.workspace }}/${{ env.working-directory }}
+          
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         run: terraform apply -auto-approve
