@@ -59,9 +59,11 @@ jobs:
           echo "$MY_STRING" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
         id: my_string
+        working-directory: ${{ env.working-directory }}
       - name: display string
         run: |
           echo "The string is: ${{ env.MY_STRING }}"
+        
 
 
       - name: Terraform show
