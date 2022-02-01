@@ -124,6 +124,7 @@ jobs:
           # behavior: new # Create a new cost estimate comment on every push.
           
       - name: Share artifact inside workflow
+        if: github.event_name == 'push'
         uses: actions/upload-artifact@v1
         with:
           name: terraform-artifact
@@ -132,6 +133,7 @@ jobs:
   deploy:
     needs: plan
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     environment: dev
     steps:
       - name: Get artifact
