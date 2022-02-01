@@ -28,3 +28,38 @@ variable "project_common_tag" {
   type        = string
   description = "Common tag for all valheim resources"
 }
+
+variable "container_name" {
+  type        = string
+  description = "ECS container name"
+}
+
+variable "ecs_image" {
+  type        = string
+  description = "ECS Image name that will be pulled"
+}
+
+variable "public_key" {
+  type        = string
+  description = "Public key that can be used to access the ec2 instances"
+}
+
+variable "adminlist_ids" {
+  type        = list(any)
+  description = "List of Valheim Admin Steam IDs"
+}
+
+variable "server_name" {
+  type        = string
+  description = "Valheim server name that is visible in the server browser"
+}
+
+variable "world_name" {
+  type        = string
+  description = "Valheim world name"
+}
+
+variable "server_pass" {
+  type        = string
+  description = "Valheim server password"
+}

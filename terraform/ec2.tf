@@ -1,6 +1,6 @@
 resource "aws_instance" "valheim-server" {
-  ami           = var.ec2_ami_id
-  instance_type = var.ec2_instance_type
+  ami                         = var.ec2_ami_id
+  instance_type               = var.ec2_instance_type
   associate_public_ip_address = true
   tags = {
     Name = "valheim-server"
@@ -8,7 +8,7 @@ resource "aws_instance" "valheim-server" {
   lifecycle {
     ignore_changes = [associate_public_ip_address]
   }
-  vpc_security_group_ids  = [aws_security_group.valheim.id]
+  vpc_security_group_ids = [aws_security_group.valheim.id]
 }
 
 resource "aws_security_group" "valheim" {
@@ -52,7 +52,7 @@ resource "aws_security_group_rule" "valheim_egress" {
   to_port           = 0
   protocol          = "-1"
   cidr_blocks       = ["0.0.0.0/0"]
-  ipv6_cidr_blocks = ["::/0"]
+  ipv6_cidr_blocks  = ["::/0"]
   security_group_id = aws_security_group.valheim.id
 }
 

@@ -21,5 +21,13 @@ provider "aws" {
     }
   }
 }
+resource "aws_key_pair" "valheim" {
+  key_name   = "valheim-admin"
+  public_key = var.public_key
+}
 
 data "aws_caller_identity" "aws-info" {}
+
+data "aws_vpc" "valheim" {
+  default = true
+}
