@@ -48,7 +48,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' ||  github.event_name == 'push'
-        run: terraform plan -no-color -out tfplan.binary
+        run: terraform plan -no-color
         continue-on-error: true
         working-directory: ${{ env.working-directory }}
 
