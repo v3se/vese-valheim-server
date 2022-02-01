@@ -142,6 +142,8 @@ jobs:
           path: ${{ env.working-directory }}
           
   deploy:
+    env:
+      TF_VAR_ec2_management_source_ip: ${{ secrets.EC2_SRC_IP }}
     needs: plan
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
