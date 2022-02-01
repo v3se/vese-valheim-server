@@ -127,7 +127,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: terraform-artifact
-          path: ${{ env.working-directory }
+          path: ${{ env.working-directory }}
           
   deploy:
     needs: plan
