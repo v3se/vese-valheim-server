@@ -52,7 +52,7 @@ jobs:
         continue-on-error: true
         working-directory: ${{ env.working-directory }}
         
-      - name: create string
+      - name: Create TF Plan string
         run: |
           MY_STRING=$(terraform plan -no-color -out tfplan.binary)
           echo "MY_STRING<<EOF" >> $GITHUB_ENV
@@ -64,8 +64,6 @@ jobs:
         run: |
           echo "The string is: ${{ env.MY_STRING }}"
         
-
-
       - name: Terraform show
         id: tf_show
         if: github.event_name == 'pull_request'
