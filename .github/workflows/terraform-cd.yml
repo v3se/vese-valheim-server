@@ -48,16 +48,21 @@ jobs:
       - name: Terraform Plan
         id: plan
         if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' ||  github.event_name == 'push'
-        run: terraform plan -no-color
+        run: terraform plan -no-color -out tfplan.binary
         continue-on-error: true
         working-directory: ${{ env.working-directory }}
+        
+      - name: create string
+        run: |
+          MY_STRING=$(terraform plan -no-color -out tfplan.binary)
+          echo "MY_STRING<<EOF" >> $GITHUB_ENV
+          echo "$MY_STRING" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        id: my_string
+      - name: display string
+        run: |
+          echo "The string is: ${{ env.MY_STRING }}"
 
-      - name: Terraform Plan 2
-        id: plan2
-        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' ||  github.event_name == 'push'
-        run: terraform plan -no-color  -out tfplan.binary
-        continue-on-error: true
-        working-directory: ${{ env.working-directory }}
 
       - name: Terraform show
         id: tf_show
@@ -80,7 +85,7 @@ jobs:
             <details><summary>Show Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN}
+            ${process.env.MY_STRING}
             \`\`\`
 
             </details>
