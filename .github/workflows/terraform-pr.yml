@@ -136,7 +136,3 @@ jobs:
           # behavior: hide-and-new # Minimize previous comments and create a new one.
           # behavior: new # Create a new cost estimate comment on every push
           
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        run: terraform apply -auto-approve
-        working-directory: ${{ env.working-directory }}
